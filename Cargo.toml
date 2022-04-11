@@ -7,3 +7,8 @@ edition = "2021"
 
 [dependencies]
 derivative = "*"
+
+[dev-dependencies]
+rdf-types = "*"
+grdf = "0.7.3"
+rand = "*"
