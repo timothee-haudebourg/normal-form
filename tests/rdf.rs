@@ -1,7 +1,7 @@
 #![feature(slice_group_by)]
 #![feature(generic_associated_types)]
 #![feature(extend_one)]
-use canonical::Canonize;
+use canonize::Canonize;
 use std::collections::BTreeSet;
 use std::fmt;
 use std::hash::Hash;
@@ -168,7 +168,7 @@ impl<T: Value> Canonize for Graph<T> {
 	fn refine_coloring(
 		&self,
 		cache: &mut Self::Cache,
-		coloring: &mut canonical::ReversibleColoring<usize>,
+		coloring: &mut canonize::ReversibleColoring<usize>,
 	) {
 		coloring.make_equitable_with(&mut cache.stack, &mut cache.map, |i| &cache.neighbors[*i])
 	}

@@ -10,17 +10,32 @@ pub use coloring::{Coloring, ReversibleColoring};
 use set::Map;
 pub use set::Set;
 
+/// Type for which a canonical form can be found.
 pub trait Canonize: Ord + Sized {
+	/// Set of elements that can be permuted in order to find the canonical form.
 	type Elements: Set;
+
+	/// Initial coloring of the permutable elements.
 	type Color: Ord;
+
+	/// Cached data used to refine the coloring at each step.
+	/// 
+	/// You can put in there the result of preliminary computations and allocations.
 	type Cache;
 
+	/// Initialize the cache.
+	/// 
+	/// This is the place to perform preliminary computations and allocations that will be
+	/// useful every time the coloring must be refined.
 	fn initialize_cache(&self) -> Self::Cache;
 
+	/// Returns a reference to the permutable elements.
 	fn elements(&self) -> &Self::Elements;
 
+	/// Returns the initial coloring of the permutable elements.
 	fn initial_coloring(&self) -> <Self::Elements as Set>::Map<Self::Color>;
 
+	/// Refine the current coloring.
 	fn refine_coloring(
 		&self,
 		_cache: &mut Self::Cache,
