@@ -654,91 +654,91 @@ mod tests {
 
 	#[test]
 	fn individualize_01() {
-		let mut coloring = rcoloring! { 1 : [ 0 ] };
+		let mut coloring = rcoloring! { 1usize : [ 0 ] };
 		coloring.individualize(&0);
-		assert_eq!(coloring, rcoloring! { 1 : [ 0 ] })
+		assert_eq!(coloring, rcoloring! { 1usize : [ 0 ] })
 	}
 
 	#[test]
 	fn deindividualize_01() {
-		let mut coloring = rcoloring! { 1 : [ 0 ] };
+		let mut coloring = rcoloring! { 1usize : [ 0 ] };
 		coloring.deindividualize(&0);
-		assert_eq!(coloring, rcoloring! { 1 : [ 0 ] })
+		assert_eq!(coloring, rcoloring! { 1usize : [ 0 ] })
 	}
 
 	#[test]
 	fn individualize_02() {
-		let mut coloring = rcoloring! { 2 : [ 0, 1 ] };
+		let mut coloring = rcoloring! { 2usize : [ 0, 1 ] };
 		coloring.individualize(&0);
-		assert_eq!(coloring, rcoloring! { 2 : [ 0 ], [ 1 ] })
+		assert_eq!(coloring, rcoloring! { 2usize : [ 0 ], [ 1 ] })
 	}
 
 	#[test]
 	fn deindividualize_02() {
-		let mut coloring = rcoloring! { 2 : [ 0 ], [ 1 ] };
+		let mut coloring = rcoloring! { 2usize : [ 0 ], [ 1 ] };
 		coloring.deindividualize(&0);
-		assert_eq!(coloring, rcoloring! { 2 : [ 0, 1 ] })
+		assert_eq!(coloring, rcoloring! { 2usize : [ 0, 1 ] })
 	}
 
 	#[test]
 	fn individualize_03() {
-		let mut coloring = rcoloring! { 2 : [ 0, 1 ] };
+		let mut coloring = rcoloring! { 2usize : [ 0, 1 ] };
 		coloring.individualize(&1);
-		assert_eq!(coloring, rcoloring! { 2 : [ 1 ], [ 0 ] })
+		assert_eq!(coloring, rcoloring! { 2usize : [ 1 ], [ 0 ] })
 	}
 
 	#[test]
 	fn deindividualize_03() {
-		let mut coloring = rcoloring! { 2 : [ 1 ], [ 0 ] };
+		let mut coloring = rcoloring! { 2usize : [ 1 ], [ 0 ] };
 		coloring.deindividualize(&1);
-		assert_eq!(coloring, rcoloring! { 2 : [ 0, 1 ] })
+		assert_eq!(coloring, rcoloring! { 2usize : [ 0, 1 ] })
 	}
 
 	#[test]
 	fn individualize_04() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.individualize(&0);
-		assert_eq!(coloring, rcoloring! { 3 : [ 0 ], [ 1, 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0 ], [ 1, 2 ] })
 	}
 
 	#[test]
 	fn deindividualize_04() {
-		let mut coloring = rcoloring! { 3 : [ 0 ], [ 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0 ], [ 1, 2 ] };
 		coloring.deindividualize(&0);
-		assert_eq!(coloring, rcoloring! { 3 : [ 0, 1, 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0, 1, 2 ] })
 	}
 
 	#[test]
 	fn individualize_05() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.individualize(&1);
-		assert_eq!(coloring, rcoloring! { 3 : [ 1 ], [ 0, 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 1 ], [ 0, 2 ] })
 	}
 
 	#[test]
 	fn deindividualize_05() {
-		let mut coloring = rcoloring! { 3 : [ 1 ], [ 0, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 1 ], [ 0, 2 ] };
 		coloring.deindividualize(&1);
-		assert_eq!(coloring, rcoloring! { 3 : [ 0, 1, 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0, 1, 2 ] })
 	}
 
 	#[test]
 	fn individualize_06() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.individualize(&2);
-		assert_eq!(coloring, rcoloring! { 3 : [ 2 ], [ 0, 1 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 2 ], [ 0, 1 ] })
 	}
 
 	#[test]
 	fn deindividualize_06() {
-		let mut coloring = rcoloring! { 3 : [ 2 ], [ 0, 1 ] };
+		let mut coloring = rcoloring! { 3usize : [ 2 ], [ 0, 1 ] };
 		coloring.deindividualize(&2);
-		assert_eq!(coloring, rcoloring! { 3 : [ 0, 1, 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0, 1, 2 ] })
 	}
 
 	#[test]
 	fn refine_01() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.refine(|i| match i {
 			0 => 0,
 			1 => 1,
@@ -746,12 +746,12 @@ mod tests {
 			_ => unreachable!(),
 		});
 
-		assert_eq!(coloring, rcoloring! { 3 : [ 0 ], [ 1 ], [ 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0 ], [ 1 ], [ 2 ] })
 	}
 
 	#[test]
 	fn refine_02() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.refine(|i| match i {
 			0 => 0,
 			1 => 0,
@@ -759,12 +759,12 @@ mod tests {
 			_ => unreachable!(),
 		});
 
-		assert_eq!(coloring, rcoloring! { 3 : [ 0, 1 ], [ 2 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 0, 1 ], [ 2 ] })
 	}
 
 	#[test]
 	fn refine_03() {
-		let mut coloring = rcoloring! { 3 : [ 0, 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0, 1, 2 ] };
 		coloring.refine(|i| match i {
 			0 => 1,
 			1 => 1,
@@ -772,12 +772,12 @@ mod tests {
 			_ => unreachable!(),
 		});
 
-		assert_eq!(coloring, rcoloring! { 3 : [ 2 ], [ 0, 1 ] })
+		assert_eq!(coloring, rcoloring! { 3usize : [ 2 ], [ 0, 1 ] })
 	}
 
 	#[test]
 	fn refine_04() {
-		let mut coloring = rcoloring! { 4 : [ 0, 1 ], [ 2, 3 ] };
+		let mut coloring = rcoloring! { 4usize : [ 0, 1 ], [ 2, 3 ] };
 		coloring.refine(|i| match i {
 			0 => 0,
 			1 => 1,
@@ -786,12 +786,12 @@ mod tests {
 			_ => unreachable!(),
 		});
 
-		assert_eq!(coloring, rcoloring! { 4 : [ 0 ], [ 1 ], [ 2 ], [ 3 ] })
+		assert_eq!(coloring, rcoloring! { 4usize : [ 0 ], [ 1 ], [ 2 ], [ 3 ] })
 	}
 
 	#[test]
 	fn refine_05() {
-		let mut coloring = rcoloring! { 4 : [ 0, 1 ], [ 2, 3 ] };
+		let mut coloring = rcoloring! { 4usize : [ 0, 1 ], [ 2, 3 ] };
 		coloring.refine(|i| match i {
 			0 => 0,
 			1 => 1,
@@ -800,12 +800,12 @@ mod tests {
 			_ => unreachable!(),
 		});
 
-		assert_eq!(coloring, rcoloring! { 4 : [ 0 ], [ 1 ], [ 2, 3 ] })
+		assert_eq!(coloring, rcoloring! { 4usize : [ 0 ], [ 1 ], [ 2, 3 ] })
 	}
 
 	#[test]
 	fn make_equitable_01() {
-		let mut coloring = rcoloring! { 3 : [ 0 ], [ 1, 2 ] };
+		let mut coloring = rcoloring! { 3usize : [ 0 ], [ 1, 2 ] };
 		coloring.make_equitable(&3, |i| match i {
 			0 => (&[1usize] as &[_]),
 			1 => &[0],

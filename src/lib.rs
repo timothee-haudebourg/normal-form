@@ -23,6 +23,8 @@ pub trait Canonize: Ord + Sized {
 	/// You can put in there the result of preliminary computations and allocations.
 	type Cache;
 
+	type Morphed: Ord;
+
 	/// Initialize the cache.
 	/// 
 	/// This is the place to perform preliminary computations and allocations that will be
@@ -45,12 +47,28 @@ pub trait Canonize: Ord + Sized {
 	}
 
 	/// Apply the given morphism.
-	fn apply_morphism<F>(&self, morphism: F) -> Self
+	fn apply_morphism<F>(&self, morphism: F) -> Self::Morphed
 	where
 		F: Fn(&<Self::Elements as Set>::Item) -> usize;
 
 	/// Computes the canonical form of this object.
-	fn canonize(&self) -> Self
+	fn canonical_form(&self) -> Self::Morphed
+	where
+		<Self::Elements as Set>::Map<usize>: Clone,
+	{
+		self.canonize().0	
+	}
+
+	/// Computes the canonical permutation of this object.
+	fn canonical_permutation(&self) -> <Self::Elements as Set>::Map<usize>
+	where
+		<Self::Elements as Set>::Map<usize>: Clone,
+	{
+		self.canonize().1
+	}
+
+	/// Computes the canonical form of this object, with the associated permutation.
+	fn canonize(&self) -> (Self::Morphed, <Self::Elements as Set>::Map<usize>)
 	where
 		<Self::Elements as Set>::Map<usize>: Clone,
 	{
@@ -64,7 +82,13 @@ pub trait Canonize: Ord + Sized {
 			))
 			.into_first_child_leaf(|coloring| self.refine_coloring(&mut cache, coloring)),
 		);
-		let mut automorphisms: BTreeMap<Self, Vec<<Self::Elements as Set>::Item>> = BTreeMap::new();
+
+		pub struct Automorphism<T: Canonize> {
+			path: Vec<<T::Elements as Set>::Item>,
+			permutation: <T::Elements as Set>::Map<usize>
+		}
+
+		let mut automorphisms: BTreeMap<Self::Morphed, Automorphism<Self>> = BTreeMap::new();
 
 		while let Some(mut n) = node {
 			let permutation = n.coloring().as_permutation().unwrap();
@@ -79,7 +103,7 @@ pub trait Canonize: Ord + Sized {
 					let len = n.path().len();
 
 					// Step 1: We find the longest common prefix path length.
-					let prefix_len = longest_common_prefix_len(n.path(), entry.get());
+					let prefix_len = longest_common_prefix_len(n.path(), &entry.get().path);
 
 					// Step 2: We skip the other nodes in this branch and directly
 					// go back to the parent node of depth `prefix_len`.
@@ -90,14 +114,18 @@ pub trait Canonize: Ord + Sized {
 					n.restore(len - prefix_len - 1); // prune the search tree.
 				}
 				Entry::Vacant(entry) => {
-					entry.insert(n.path().clone());
+					entry.insert(Automorphism {
+						path: n.path().clone(),
+						permutation: permutation.clone()
+					});
 				}
 			}
 
 			node = n.into_next_leaf(|coloring| self.refine_coloring(&mut cache, coloring));
 		}
 
-		automorphisms.into_keys().next().unwrap()
+		let (normal_form, data) = automorphisms.into_iter().next().unwrap();
+		(normal_form, data.permutation)
 	}
 }
 

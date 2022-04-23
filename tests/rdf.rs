@@ -52,6 +52,7 @@ impl<T: Value> Canonize for Graph<T> {
 	type Elements = usize;
 	type Color = Vec<Color<T>>;
 	type Cache = Cache;
+	type Morphed = Self;
 
 	fn elements(&self) -> &usize {
 		&self.variable_count
