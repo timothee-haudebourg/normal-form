@@ -120,10 +120,17 @@ impl<S: Set + ?Sized> Coloring<S> {
 		}
 	}
 
-	#[allow(clippy::len_without_is_empty)]
 	/// Returns the number of colors in the coloring.
 	pub fn len(&self) -> usize {
-		self.bounds.len() + 1
+		if self.is_empty() {
+			0
+		} else {
+			self.bounds.len() + 1
+		}
+	}
+
+	pub fn is_empty(&self) -> bool {
+		self.elements.is_empty()
 	}
 
 	/// Checks if the coloring is a unit coloring.
@@ -132,6 +139,7 @@ impl<S: Set + ?Sized> Coloring<S> {
 	}
 
 	pub fn is_discrete(&self) -> bool {
+		debug_assert!(self.len() <= self.elements.len());
 		self.len() == self.elements.len()
 	}
 

@@ -287,7 +287,7 @@ fn simple_no_automorphism() {
 
 	let b: Graph<bool> = make_graph(3, [Triple(Var(2), Var(1), Var(0))]);
 
-	assert_eq!(a.canonize(), b.canonize())
+	assert_eq!(a.canonize().0, b.canonize().0)
 }
 
 #[test]
@@ -311,17 +311,17 @@ fn simple_automorphism() {
 		],
 	);
 
-	assert_eq!(a.canonize(), b.canonize())
+	assert_eq!(a.canonize().0, b.canonize().0)
 }
 
 fn test_random(variable_count: usize, max_len: usize) {
 	for _ in 0..100 {
 		let a = make_random_graph(variable_count, max_len);
-		let canonized_a = a.canonize();
+		let canonized_a = a.canonize().0;
 
 		for _ in 0..10 {
 			let b = random_morphism(&a);
-			assert_eq!(canonized_a, b.canonize())
+			assert_eq!(canonized_a, b.canonize().0)
 		}
 	}
 }
@@ -335,7 +335,7 @@ fn test_random_negative(variable_count: usize, max_len: usize) {
 		let a = make_random_graph(variable_count, max_len);
 		let b = make_random_graph(variable_count, max_len);
 
-		if a.canonize() != b.canonize() {
+		if a.canonize().0 != b.canonize().0 {
 			return; // success
 		}
 	}

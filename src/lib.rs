@@ -7,11 +7,11 @@ pub mod set;
 mod tree;
 
 pub use coloring::{Coloring, ReversibleColoring};
-use set::Map;
+pub use set::Map;
 pub use set::Set;
 
 /// Type for which a canonical form can be found.
-pub trait Canonize: Ord + Sized {
+pub trait Canonize: Sized {
 	/// Set of elements that can be permuted in order to find the canonical form.
 	type Elements: Set;
 
@@ -91,6 +91,7 @@ pub trait Canonize: Ord + Sized {
 		let mut automorphisms: BTreeMap<Self::Morphed, Automorphism<Self>> = BTreeMap::new();
 
 		while let Some(mut n) = node {
+			debug_assert!(n.coloring().is_discrete());
 			let permutation = n.coloring().as_permutation().unwrap();
 			let morphed = self.apply_morphism(|i| *permutation.get(i).unwrap());
 			match automorphisms.entry(morphed) {
