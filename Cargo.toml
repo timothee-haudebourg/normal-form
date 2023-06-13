@@ -1,9 +1,9 @@
 [package]
 name = "normal-form"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Timothée Haudebourg <author@haudebourg.net>"]
-description = "Common RDF types definitions."
+description = "A trait to easily find the canonical/normal form of graph structures."
 categories = ["algorithms", "mathematics"]
 keywords = ["graph", "group", "combinatorics", "canonical", "normal"]
 repository = "https://github.com/timothee-haudebourg/normal-form"
