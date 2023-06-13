@@ -1,14 +1,20 @@
 [package]
-name = "canonize"
+name = "normal-form"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Timothée Haudebourg <author@haudebourg.net>"]
+description = "Common RDF types definitions."
+categories = ["algorithms", "mathematics"]
+keywords = ["graph", "group", "combinatorics", "canonical", "normal"]
+repository = "https://github.com/timothee-haudebourg/normal-form"
+documentation = "https://docs.rs/normal-form"
+license = "MIT/Apache-2.0"
+readme = "README.md"
 
 [dependencies]
-derivative = "*"
+derivative = "2.2.0"
 
 [dev-dependencies]
-rdf-types = "*"
-grdf = "0.7.3"
-rand = "*"
+rdf-types = "0.15.3"
+grdf = "0.19.0"
+rand = "0.8.5"
