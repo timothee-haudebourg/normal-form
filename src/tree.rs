@@ -1,15 +1,8 @@
 use crate::{ReversibleColoring, Set};
-use std::fmt;
 
 pub struct Node<S: Set + ?Sized> {
 	path: Vec<S::Item>, // TODO: Replace with a more memory efficient type.
 	coloring: ReversibleColoring<S>,
-}
-
-impl<S: Set + ?Sized> fmt::Debug for Node<S> {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "path: {:?}, coloring: {:?}", self.path, self.coloring)
-	}
 }
 
 impl<S: Set + ?Sized> Node<S> {
@@ -37,13 +30,7 @@ impl<S: Set + ?Sized> Node<S> {
 	}
 
 	pub fn children_color(&self) -> Option<&[S::Item]> {
-		for color in self.coloring.colors() {
-			if color.len() > 1 {
-				return Some(color);
-			}
-		}
-
-		None
+		self.coloring.colors().find(|&color| color.len() > 1)
 	}
 
 	// pub fn children(&self) -> Children<S> {
@@ -99,14 +86,15 @@ impl<S: Set + ?Sized> Node<S> {
 	{
 		debug_assert_eq!(self.path.len(), self.coloring.depth());
 		let last = self.path.pop()?;
+		self.coloring.restore(1); // undo individualization & refinement.
+
 		let color_index = self.coloring.color_index_of(&last).unwrap();
-		let siblings_color = self.coloring.get(color_index + 1).unwrap();
-		let next_sibling_index = siblings_color.binary_search(&last).unwrap_err();
-		match siblings_color.get(next_sibling_index) {
+		let color = self.coloring.get(color_index).unwrap();
+		let next_sibling_index = color.binary_search(&last).unwrap() + 1;
+		match color.get(next_sibling_index) {
 			Some(next_sibling) => {
 				// move to next sibling...
 				let next_sibling = next_sibling.clone();
-				self.coloring.restore(1); // (move to parent)
 				self.individualize(next_sibling, &mut refine);
 
 				while let Some(color) = self.children_color() {
@@ -119,7 +107,6 @@ impl<S: Set + ?Sized> Node<S> {
 			}
 			None => {
 				// move to parent node...
-				self.coloring.restore(1);
 				debug_assert_eq!(self.path.len(), self.coloring.depth());
 				self.into_next_leaf(refine) // ...then move to sibling leaf
 			}

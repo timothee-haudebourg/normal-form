@@ -1,5 +1,9 @@
-#![feature(generic_associated_types)]
-#![feature(is_sorted)]
+//! This library provides a simple method to find the normal/canonical form
+//! of a structure, as long as it implements the provided `Normalize` trait.
+//! It is an implementation of *Practical graph isomorphism, II*
+//! [[McKay 2013]](https://arxiv.org/pdf/1301.1493.pdf) and heavily inspired by
+//! the [canonical-form](https://crates.io/crates/canonical-form) crate with the
+//! addition of caching and associated abstraction types.
 use std::collections::BTreeMap;
 
 mod coloring;
@@ -11,7 +15,7 @@ pub use set::Map;
 pub use set::Set;
 
 /// Type for which a canonical form can be found.
-pub trait Canonize: Sized {
+pub trait Normalize: Sized {
 	/// Set of elements that can be permuted in order to find the canonical form.
 	type Elements: Set;
 
@@ -19,14 +23,14 @@ pub trait Canonize: Sized {
 	type Color: Ord;
 
 	/// Cached data used to refine the coloring at each step.
-	/// 
+	///
 	/// You can put in there the result of preliminary computations and allocations.
 	type Cache;
 
 	type Morphed: Ord;
 
 	/// Initialize the cache.
-	/// 
+	///
 	/// This is the place to perform preliminary computations and allocations that will be
 	/// useful every time the coloring must be refined.
 	fn initialize_cache(&self) -> Self::Cache;
@@ -52,11 +56,11 @@ pub trait Canonize: Sized {
 		F: Fn(&<Self::Elements as Set>::Item) -> usize;
 
 	/// Computes the canonical form of this object.
-	fn canonical_form(&self) -> Self::Morphed
+	fn normal_form(&self) -> Self::Morphed
 	where
 		<Self::Elements as Set>::Map<usize>: Clone,
 	{
-		self.canonize().0	
+		self.normalize().0
 	}
 
 	/// Computes the canonical permutation of this object.
@@ -64,28 +68,29 @@ pub trait Canonize: Sized {
 	where
 		<Self::Elements as Set>::Map<usize>: Clone,
 	{
-		self.canonize().1
+		self.normalize().1
 	}
 
 	/// Computes the canonical form of this object, with the associated permutation.
-	fn canonize(&self) -> (Self::Morphed, <Self::Elements as Set>::Map<usize>)
+	fn normalize(&self) -> (Self::Morphed, <Self::Elements as Set>::Map<usize>)
 	where
 		<Self::Elements as Set>::Map<usize>: Clone,
 	{
 		use std::collections::btree_map::Entry;
 		let mut cache = self.initialize_cache();
 		let elements = self.elements();
+		let initial_coloring = self.initial_coloring();
 		let mut node = Some(
 			tree::Node::root(ReversibleColoring::from_coloring(
 				elements,
-				Coloring::from_map(elements, &self.initial_coloring()),
+				Coloring::from_map(elements, &initial_coloring),
 			))
 			.into_first_child_leaf(|coloring| self.refine_coloring(&mut cache, coloring)),
 		);
 
-		pub struct Automorphism<T: Canonize> {
+		pub struct Automorphism<T: Normalize> {
 			path: Vec<<T::Elements as Set>::Item>,
-			permutation: <T::Elements as Set>::Map<usize>
+			permutation: <T::Elements as Set>::Map<usize>,
 		}
 
 		let mut automorphisms: BTreeMap<Self::Morphed, Automorphism<Self>> = BTreeMap::new();
@@ -117,7 +122,7 @@ pub trait Canonize: Sized {
 				Entry::Vacant(entry) => {
 					entry.insert(Automorphism {
 						path: n.path().clone(),
-						permutation: permutation.clone()
+						permutation: permutation.clone(),
 					});
 				}
 			}

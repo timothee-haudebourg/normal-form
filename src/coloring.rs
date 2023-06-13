@@ -298,7 +298,8 @@ impl<S: Set + ?Sized> ReversibleColoring<S> {
 
 	fn check(&self) -> bool {
 		for (i, color) in self.colors().enumerate() {
-			if !color.is_sorted() {
+			if color.windows(2).any(|a| a[0] > a[1]) {
+				// not sorted
 				return false;
 			}
 
@@ -563,6 +564,8 @@ impl<S: Set + ?Sized> ReversibleColoring<S> {
 	/// Make this coloring equitable.
 	///
 	/// The stack is empty when this function returns.
+	/// The map must be initialized so that each element is mapped (the value
+	/// does not matter).
 	pub fn make_equitable_with<'i, F, I>(
 		&mut self,
 		stack: &mut Vec<usize>,
@@ -573,6 +576,7 @@ impl<S: Set + ?Sized> ReversibleColoring<S> {
 		I: IntoIterator<Item = &'i S::Item>,
 		S::Item: 'i,
 	{
+		debug_assert_eq!(map.len(), self.reverse.len());
 		stack.clear();
 		stack.extend(0..self.len());
 
@@ -815,7 +819,7 @@ mod tests {
 	fn make_equitable_01() {
 		let mut coloring = rcoloring! { 3usize : [ 0 ], [ 1, 2 ] };
 		coloring.make_equitable(&3, |i| match i {
-			0 => (&[1usize] as &[_]),
+			0 => &[1usize] as &[_],
 			1 => &[0],
 			2 => &[],
 			_ => unreachable!(),

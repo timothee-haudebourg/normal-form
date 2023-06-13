@@ -1,7 +1,4 @@
-#![feature(slice_group_by)]
-#![feature(generic_associated_types)]
-#![feature(extend_one)]
-use canonize::Canonize;
+use normal_form::Normalize;
 use std::collections::BTreeSet;
 use std::fmt;
 use std::hash::Hash;
@@ -48,7 +45,7 @@ impl<T: Value> fmt::Debug for Graph<T> {
 	}
 }
 
-impl<T: Value> Canonize for Graph<T> {
+impl<T: Value> Normalize for Graph<T> {
 	type Elements = usize;
 	type Color = Vec<Color<T>>;
 	type Cache = Cache;
@@ -97,9 +94,12 @@ impl<T: Value> Canonize for Graph<T> {
 			}
 		}
 
+		let mut map = Vec::new();
+		map.resize(self.variable_count, 0);
+
 		Cache {
 			stack: Vec::new(),
-			map: Vec::new(),
+			map,
 			neighbors,
 		}
 	}
@@ -169,7 +169,7 @@ impl<T: Value> Canonize for Graph<T> {
 	fn refine_coloring(
 		&self,
 		cache: &mut Self::Cache,
-		coloring: &mut canonize::ReversibleColoring<usize>,
+		coloring: &mut normal_form::ReversibleColoring<usize>,
 	) {
 		coloring.make_equitable_with(&mut cache.stack, &mut cache.map, |i| &cache.neighbors[*i])
 	}
@@ -184,7 +184,7 @@ impl<T: Value> Canonize for Graph<T> {
 				s.apply_morphism(&f),
 				p.apply_morphism(&f),
 				o.apply_morphism(&f),
-			))
+			));
 		}
 
 		Self {
@@ -287,7 +287,7 @@ fn simple_no_automorphism() {
 
 	let b: Graph<bool> = make_graph(3, [Triple(Var(2), Var(1), Var(0))]);
 
-	assert_eq!(a.canonize().0, b.canonize().0)
+	assert_eq!(a.normalize().0, b.normalize().0)
 }
 
 #[test]
@@ -311,17 +311,17 @@ fn simple_automorphism() {
 		],
 	);
 
-	assert_eq!(a.canonize().0, b.canonize().0)
+	assert_eq!(a.normalize().0, b.normalize().0)
 }
 
 fn test_random(variable_count: usize, max_len: usize) {
 	for _ in 0..100 {
 		let a = make_random_graph(variable_count, max_len);
-		let canonized_a = a.canonize().0;
+		let canonized_a = a.normalize().0;
 
 		for _ in 0..10 {
 			let b = random_morphism(&a);
-			assert_eq!(canonized_a, b.canonize().0)
+			assert_eq!(canonized_a, b.normalize().0)
 		}
 	}
 }
@@ -335,7 +335,7 @@ fn test_random_negative(variable_count: usize, max_len: usize) {
 		let a = make_random_graph(variable_count, max_len);
 		let b = make_random_graph(variable_count, max_len);
 
-		if a.canonize().0 != b.canonize().0 {
+		if a.normalize().0 != b.normalize().0 {
 			return; // success
 		}
 	}
@@ -346,6 +346,33 @@ fn test_random_negative(variable_count: usize, max_len: usize) {
 #[test]
 fn random_3_10() {
 	test_random(3, 10)
+}
+
+#[test]
+fn anomaly() {
+	use rdf_types::Triple;
+	use Term::*;
+	let a: Graph<bool> = make_graph(
+		9,
+		[
+			Triple(Var(8), Var(0), Var(8)), // 1 0 1
+			Triple(Var(3), Var(7), Var(6)), // 2 4 8
+			Triple(Var(4), Var(1), Var(6)), // 3 6 8
+			Triple(Var(4), Var(2), Var(5)), // 3 5 7
+		],
+	);
+
+	let b: Graph<bool> = make_graph(
+		9,
+		[
+			Triple(Var(1), Var(0), Var(1)), // 1 0 1
+			Triple(Var(3), Var(6), Var(2)), // 2 5 8
+			Triple(Var(5), Var(4), Var(2)), // 3 6 8
+			Triple(Var(5), Var(8), Var(7)), // 3 4 7
+		],
+	);
+
+	assert_eq!(a.normalize().0, b.normalize().0)
 }
 
 #[test]
